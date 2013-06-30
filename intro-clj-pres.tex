@@ -158,7 +158,7 @@ and there's more \ldots
 
 \begin{frame}{Teasers}
 	\begin{enumerate}[<+->]
-	\item Add sum of squares of all numbers in a list
+	\item Average all numbers in a list
 	\item Open, use, and close multiple system resources
 	\item Filter all lines of a file based on a reg. exp.
 	\item Read in a line, skip first line, take every 3rd	
@@ -167,7 +167,7 @@ and there's more \ldots
 
 \begin{frame}{Teaser \#1}
 	\begin{itemize}
-        \item Idea: Add sum of squares of all numbers in a list
+        \item Idea: Average all numbers in a list
         \item Java\\
 \begin{small}
 {\ttfamily\color{black}
@@ -2244,7 +2244,7 @@ soln-fn ops\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{)))}}
 \begin{frame}{Closures}
   \begin{itemize}
   \item \texttt{soln-fn} is a closure -- the values of
-    \texttt{a} and \texttt{b} are pulled from surrounding scope
+    \texttt{a}, \texttt{b}, and \texttt{disc-sqrt} are pulled from surrounding scope
   \item Even if \texttt{soln-fn} is passed elsewhere, the values of
     \texttt{a} and \texttt{b} in \texttt{soln-fn} don't change after fn creation \&
     binding 
@@ -2491,7 +2491,7 @@ CaSiNg{\textquotedbl}}\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{)}}
 {\ttfamily\color{black}
 \#\{1 2 3 12\}}
   \item \texttt{assoc} (for maps) adds a key and its value, \texttt{dissoc}
-    removes a key and value given a key\\
+    removes a key and its value, given a key\\
   \item \texttt{disj} is the opposite of \texttt{conj} for a set\\
   \end{itemize}
 \end{frame}
@@ -2513,14 +2513,14 @@ CaSiNg{\textquotedbl}}\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{)}}
 
 {\ttfamily\color{black}
 [3 8 9 5 -1 4 1 6]}
-  \item When what you want comes as a sequence:\\
+  \item When what you want comes as a sequence\ldots:\\
 {\ttfamily\color{black}
 \textcolor[rgb]{0.49803922,0.0,0.49803922}{user{\textgreater}
 }\textbf{(max (filter odd? [3 8 9 5 -1 4 1 6]))}}
 
 {\ttfamily\color{black}
 (3 9 5 -1 1)}
-  \item Use \texttt{apply} to ``unpack'' the sequence and apply the
+  \item \ldots use \texttt{apply} to ``unpack'' the sequence and apply the
     fn:\\
 
 {\ttfamily\color{black}
@@ -2544,7 +2544,7 @@ CaSiNg{\textquotedbl}}\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{)}}
     \end{itemize}
 
     \framebreak
-  \item Threading macros (\texttt{->} and \texttt{->>})
+  \item Basic hreading macros (\texttt{->} and \texttt{->>})
     \begin{itemize}
     \item Write nested forms ``inside out'' (more readable)
     \item \texttt{->} puts result of previous form in 2nd position
@@ -2708,20 +2708,21 @@ n\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{)}}
     \item \texttt{with-open}
       \begin{itemize}
       \item \ldots is a macro in Clojure
-      \item ``Imported'' into Python, but can only be done as language
-        syntax (only by language maintainers)
+      \item Copied into Python, but only possible as official language
+        syntax (= impl'ed by language maintainers)
       \end{itemize}
-    \item The \texttt{some->} macro
+    \item The \texttt{some->} threading macro
       \begin{itemize}
       \item (officially added in Clojure 1.5)
       \item already functionally existed in contrib library as \texttt{-?>}
       \end{itemize}
     \item Most of Clojure is implemented as fns and macros
       \begin{itemize}
-      \item A few ``special form'' fns exist as elemental building
+      \item A few \textit{special forms} exist as elemental building
         blocks
-      \item Rest of language is composed of previously-defined fns and
-        macros
+      \item Rest of language (fns and macros) is composed of
+        previously-defined forms (special forms, fns and
+        macros)
       \item Syntax is simple and doesn't change
       \item New lang. versions mostly just add fns, macros, etc. $\Rightarrow$ backwards-compatibility
       \end{itemize}
@@ -2737,9 +2738,9 @@ n\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{)}}
   \item Simplicity $\rightarrow$ immutability
   \item Concurrency $\rightarrow$ immutability
   \item Concurrency $\rightarrow$ STM
+  \item Simplicity $\rightarrow$ functional programming
   \item Functional programming $\rightarrow$ immutability
   \item Immutability $\rightarrow$ persistant data structures
-  \item Functional programming $\rightarrow$ referential transparency
   \end{itemize}
 \end{frame}
 
@@ -2775,7 +2776,7 @@ n\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{)}}
     \item Lisp helps you get better at programming (even if you don't
       use it)
     \item Not a better vs. worse
-    \item But maybe a powerful vs. more powerful
+    \item But maybe a \href{http://www.paulgraham.com/avg.html}{powerful vs. more powerful}
       \begin{itemize}
       \item If we agree that two languages can differ in power (ex:
         Perl vs. Basic)
@@ -2784,7 +2785,7 @@ n\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{)}}
       \begin{itemize}
       \item Ex: a language's power may cost performance
       \end{itemize}
-    \item Language discussions $\rightarrow$ emotional arguments b/c of proximity
+    \item Many language discussions $\rightarrow$ emotional arguments b/c of proximity
       to mind \& identity
       \begin{itemize}
       \item Or so wrote Paul Graham -
@@ -2806,9 +2807,9 @@ n\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{)}}
   \begin{itemize}
   \item Videos of Easy-to-follow Lectures by Rich Hickey
     \begin{itemize}
-    \item Data structures (Pt. 1 \& Pt. 2); Sequences; Concurrency
-    \item Clojure for Java Programmers (Pt. 1 \& Pt. 2)
-    \item Clojure for Lisp Programmers (Pt. 1 \& Pt. 2)
+    \item At \href{http://www.youtube.com/clojuretv}{Clojure's
+      Youtube channel}
+    \item Data structures; Sequences; Concurrency; Clojure for \{Java Programmers, Lisp Programmers\}
     \end{itemize}
   \item Books (my recommendations)
     \begin{itemize}
@@ -2824,6 +2825,9 @@ n\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{)}}
       better
     \item I learned a lot by following these users' solutions: 0x89, \_pcl, austintaylor, jbear, maximental, nikelandjelo, jfacorro, jsmith145, chouser, cgrand
     \end{itemize}
+  \item Shameless plug:
+    \href{http://www.elangocheran.com/blog/2012/03/the-newbies-guide-learning-clojure/}{The
+    Newbie's Guide to Learning Clojure}
   \end{itemize}
 \end{frame}
 
