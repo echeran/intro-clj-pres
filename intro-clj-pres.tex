@@ -2532,6 +2532,47 @@ CaSiNg{\textquotedbl}}\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{)}}
   \end{itemize}
 \end{frame}
 
+\begin{frame}{Interlude - \texttt{clojure.inspector}}
+  \begin{itemize}
+  \item Run the following (preferably in command-line REPL):\\
+
+\bigskip
+
+{\ttfamily\color{black}
+%
+\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}\textcolor[rgb]{0.28235295,0.23921569,0.54509807}{use}
+{\textquotesingle}clojure.inspector\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{)}}
+
+
+\bigskip
+
+{\ttfamily\color{black}
+\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}\textcolor[rgb]{0.13333334,0.54509807,0.13333334}{inspect}
+[3 8 9 5 -1 4 1 6]\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{)}}
+
+
+\bigskip
+
+{\ttfamily\color{black}
+\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}\textcolor[rgb]{0.13333334,0.54509807,0.13333334}{inspect-tree}
+[1 [2 [3 4]] 5]\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{)}}
+
+
+\bigskip
+
+{\ttfamily\color{black}
+\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}\textcolor[rgb]{0.28235295,0.23921569,0.54509807}{require}
+{\textquotesingle}[clojure.xml
+\textcolor[rgb]{0.0,0.54509807,0.54509807}{:as}
+xml]\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{)}}
+
+{\ttfamily\color{black}
+\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}\textcolor[rgb]{0.13333334,0.54509807,0.13333334}{inspect-tree}
+\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}xml/parse
+\textcolor[rgb]{0.54509807,0.13333334,0.32156864}{{\textquotedbl}http://www.w3schools.com/xml/note.xml{\textquotedbl}}\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{))}}
+  \end{itemize}
+\end{frame}
+
 \begin{frame}[allowframebreaks]{Macros}
   \begin{itemize}
   \item Powerful pre-evaluation step
