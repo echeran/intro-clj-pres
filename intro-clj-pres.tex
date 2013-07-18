@@ -2892,5 +2892,643 @@ n\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{)}}
 %%   \end{enumerate}
 %% \end{frame}
 
+\section{Extras}
+
+\subsection{Cascalog}
+
+\begin{frame}[allowframebreaks]{What is Cascalog?}
+  \begin{itemize}
+  \item You have a MapReduce (Hadoop) installation
+    \begin{itemize}
+    \item You put data on the filesystem (HDFS)
+    \item You perform queries / analysis on data
+    \end{itemize}
+  \item Cascalog enables queries in Datalog syntax
+    \begin{itemize}
+    \item Datalog - Scheme-based subset of Prolog - queries must
+      terminate?
+    \item ``-log'' - logic programming
+    \item logic programming is declarative (like SQL!)
+    \end{itemize}
+
+    \framebreak
+
+  \item The point
+    \begin{itemize}
+    \item Queries are now a set of filters
+    \item $\Rightarrow$ No special syntax
+    \item $\Rightarrow$ We can combine/compose queries, run them in
+      parallel, etc.
+    \item Implemented as a DSL $\Rightarrow$ can mix in regular fns
+    \end{itemize}
+  \item Based on Cascading - Java library on top of Hadoop MapReduce
+    \begin{itemize}
+    \item Cascading establishes concept of flows
+    \item Casca- + -log = Cascalog
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Most Basic Setup}
+  \begin{itemize}
+  \item Create a new Leiningen project
+  \item Basic \texttt{project.clj} file:\\
+\begin{small}
+{\ttfamily\color{black}
+%
+(defproject happy-clickers
+\textcolor[rgb]{0.54509807,0.13333334,0.32156864}{{\textquotedbl}0.1.0-SNAPSHOT{\textquotedbl}}}
+
+{\ttfamily\color{black}
+\ \ \textcolor[rgb]{0.28235295,0.23921569,0.54509807}{:description}
+\textcolor[rgb]{0.54509807,0.13333334,0.32156864}{{\textquotedbl}}\textcolor[rgb]{0.54509807,0.13333334,0.32156864}{FIXME:
+write description{\textquotedbl}}}
+
+{\ttfamily\color{black}
+\ \ \textcolor[rgb]{0.28235295,0.23921569,0.54509807}{:url}
+\textcolor[rgb]{0.54509807,0.13333334,0.32156864}{{\textquotedbl}http://example.com/FIXME{\textquotedbl}}}
+
+{\ttfamily\color{black}
+\ \ \textcolor[rgb]{0.28235295,0.23921569,0.54509807}{:license}
+\{\textcolor[rgb]{0.28235295,0.23921569,0.54509807}{:name}
+\textcolor[rgb]{0.54509807,0.13333334,0.32156864}{{\textquotedbl}Eclipse
+Public License{\textquotedbl}}}
+
+{\ttfamily\color{black}
+\ \ \ \ \ \ \ \ \ \ \ \ \textcolor[rgb]{0.28235295,0.23921569,0.54509807}{:url}
+\textcolor[rgb]{0.54509807,0.13333334,0.32156864}{{\textquotedbl}http://www.eclipse.org/legal/epl-v10.html{\textquotedbl}}\}}
+
+{\ttfamily\color{black}
+\ \ \textcolor[rgb]{0.28235295,0.23921569,0.54509807}{:dependencies}
+[[org.clojure/clojure
+\textcolor[rgb]{0.54509807,0.13333334,0.32156864}{{\textquotedbl}1.5.1{\textquotedbl}}]}
+
+{\ttfamily\color{black}
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [cascalog
+\textcolor[rgb]{0.54509807,0.13333334,0.32156864}{{\textquotedbl}1.10.1{\textquotedbl}}]]}
+
+{\ttfamily\color{black}
+\ \ \textcolor[rgb]{0.28235295,0.23921569,0.54509807}{:repositories}
+\{\textcolor[rgb]{0.54509807,0.13333334,0.32156864}{{\textquotedbl}cloudera{\textquotedbl}}
+\textcolor[rgb]{0.54509807,0.13333334,0.32156864}{{\textquotedbl}https://repository.cloudera.com/artifactory/cloudera-repos{\textquotedbl}}\}}
+
+{\ttfamily\color{black}
+\ \ \textcolor[rgb]{0.28235295,0.23921569,0.54509807}{:profiles}
+\{\textcolor[rgb]{0.28235295,0.23921569,0.54509807}{:provided}
+\{\textcolor[rgb]{0.28235295,0.23921569,0.54509807}{:dependencies}
+[[org.apache.hadoop/hadoop-core
+\ \textcolor[rgb]{0.54509807,0.13333334,0.32156864}{{\textquotedbl}0.20.2-cdh3u5{\textquotedbl}}]]\}\}}
+
+{\ttfamily\color{black}
+\ \ \textcolor[rgb]{0.28235295,0.23921569,0.54509807}{:aot}
+[happy-clickers.core]}
+
+{\ttfamily\color{black}
+\ \ \textcolor[rgb]{0.28235295,0.23921569,0.54509807}{:main}
+happy-clickers.core}
+
+{\ttfamily\color{black}
+\ \ )}
+\end{small}
+
+\framebreak
+
+  \item Source file setup:\\
+
+\begin{small}
+{\ttfamily\color{black}
+%
+(ns happy-clickers.core}
+
+{\ttfamily\color{black}
+\ \ (\textcolor[rgb]{0.28235295,0.23921569,0.54509807}{:gen-class})}
+
+{\ttfamily\color{black}
+\ \ (\textcolor[rgb]{0.28235295,0.23921569,0.54509807}{:require}
+[cascalog.ops \textcolor[rgb]{0.28235295,0.23921569,0.54509807}{:as}
+ops]}
+
+{\ttfamily\color{black}
+\ \ \ \ \ \ \ \ \ \ \ \ [cascalog.vars
+\textcolor[rgb]{0.28235295,0.23921569,0.54509807}{:as} vars])}
+
+{\ttfamily\color{black}
+\ \ (\textcolor[rgb]{0.28235295,0.23921569,0.54509807}{:use}
+[cascalog.api]))}
+
+
+\bigskip
+
+
+\bigskip
+
+{\ttfamily\color{black}
+(defn -main}
+
+{\ttfamily\color{black}
+\ \ \textcolor[rgb]{0.54509807,0.13333334,0.32156864}{{\textquotedbl}initiate
+execution when run as a standalone app{\textquotedbl}}}
+
+{\ttfamily\color{black}
+\ \ [\& args]}
+
+{\ttfamily\color{black}
+\ \ \textcolor[rgb]{0.69803923,0.13333334,0.13333334}{;; do stuff}}
+
+{\ttfamily\color{black}
+\ \ )}
+\end{small}
+
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Deployment}
+  \begin{itemize}
+  \item \texttt{lein uberjar} - create the JAR file to run on Hadoop
+  \item \texttt{hadoop jar} - run the JAR file
+    \begin{itemize}
+    \item Hadoop doesn't know (or care) that JAR file generated
+      through Clojure
+    \end{itemize}
+  \item Testing
+    \begin{itemize}
+    \item You can create a REPL to run queries, etc.
+    \item You can choose inputs to be from HDFS, LFS, or hand-created
+      Clojure data
+    \item But still working on this, among other things \ldots
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}{Example Prompt}
+  \begin{enumerate}
+  \item Given a file of online events (uid, impression, click, etc.)
+  \item Per uid, get \# of impressions, \& \# of clicks
+  \item Determine $CTR = impressions / clicks$
+  \item Filter out when $clicks <= 2$ or $CTR < 0.02$
+  \item For the CTR values, compute quartiles
+  \item Add the quartile number to each uid
+  \end{enumerate}
+\end{frame}
+
+
+
+
+\begin{frame}{Query 1 - get quartile boundaries}
+
+\begin{small}
+{\ttfamily\color{black}
+\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}\textcolor[rgb]{0.49803922,0.0,0.49803922}{defn}
+\textcolor{blue}{query1}}
+
+{\ttfamily\color{black}
+\ \ [source]}
+
+{\ttfamily\color{black}
+\ \ \textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}\textcolor[rgb]{0.49803922,0.0,0.49803922}{let}
+[hclks
+\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}happy-clickers
+source\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{)}}
+
+{\ttfamily\color{black}
+\ \ \ \ \ \ \ \ hclk-ctrs
+\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}{\textless}- [?ctr]
+\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}hclks ?uid
+?ctr\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{))}}
+
+{\ttfamily\color{black}
+\ \ \ \ \ \ \ \ ctr-quartiles
+\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}{\textless}- [?min
+?b12 ?b23 ?b34 ?max]
+\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}hclk-ctrs
+?ctr\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{)}
+\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}quartile-bounds
+?ctr \textcolor[rgb]{0.0,0.54509807,0.54509807}{:{\textgreater}} ?min
+?b12 ?b23 ?b34
+?max\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{))}]}
+
+{\ttfamily\color{black}
+\ \ \ \ ctr-quartiles\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{))}}
+\end{small}
+
+\end{frame}
+
+\begin{frame}{CTR calculation}
+\begin{small}
+{\ttfamily\color{black}
+\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}\textcolor[rgb]{0.49803922,0.0,0.49803922}{defn}
+\textcolor{blue}{happy-clickers}}
+
+{\ttfamily\color{black}
+\ \ [source]}
+
+{\ttfamily\color{black}
+\ \ \textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}{\textless}-
+[?uid ?ctr]}
+
+
+{\ttfamily\color{black}
+\ \ \ \ \ \ \textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}source
+\_ \_ \_ \_ \_ \_ \_ \_ ?uid ?impr ?clk
+?actn\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{)}}
+
+{\ttfamily\color{black}
+\ \ \ \ \ \ \textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}parse-int
+?clk \textcolor[rgb]{0.0,0.54509807,0.54509807}{:{\textgreater}}
+?click\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{)}}
+
+{\ttfamily\color{black}
+\ \ \ \ \ \ \textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}parse-int
+?impr \textcolor[rgb]{0.0,0.54509807,0.54509807}{:{\textgreater}}
+?impression\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{)}}
+
+{\ttfamily\color{black}
+\ \ \ \ \ \ \textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}ops/sum
+?click \textcolor[rgb]{0.0,0.54509807,0.54509807}{:{\textgreater}}
+?clicks\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{)}}
+
+{\ttfamily\color{black}
+\ \ \ \ \ \ \textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}ops/sum
+?impression \textcolor[rgb]{0.0,0.54509807,0.54509807}{:{\textgreater}}
+?impressions\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{)}}
+
+{\ttfamily\color{black}
+\ \ \ \ \ \ \textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}\textcolor[rgb]{0.28235295,0.23921569,0.54509807}{{\textless}=}
+2 ?impressions\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{)}
+\textcolor[rgb]{0.69803923,0.13333334,0.13333334}{;; includes
+preventing divide-by-zero. as it}}
+
+{\ttfamily\color{black}
+\ \ \ \ \ \ \textcolor[rgb]{0.69803923,0.13333334,0.13333334}{;; turns
+out, order of predicates matters for the divide-by-zero check }}
+
+{\ttfamily\color{black}
+\ \ \ \ \ \ \textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}div
+?clicks ?impressions
+\textcolor[rgb]{0.0,0.54509807,0.54509807}{:{\textgreater}}
+?ctr\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{)}}
+
+{\ttfamily\color{black}
+\ \ \ \ \ \ \textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}\textcolor[rgb]{0.28235295,0.23921569,0.54509807}{{\textless}}
+0.05 ?ctr\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{)))}}
+
+\end{small}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Parsing input tap}
+
+\begin{small}
+{\ttfamily\color{black}
+\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}\textcolor[rgb]{0.49803922,0.0,0.49803922}{defn-}
+\textcolor{blue}{in-tap-parsed}}
+
+{\ttfamily\color{black}
+\ \ \textcolor[rgb]{0.54509807,0.13333334,0.32156864}{{\textquotedbl}Helper
+fn that takes lines of input from a source tap, splits the line, and
+returns only a specified constant number of Cascalog vars. \ Helper fn
+to be used whether input is textline or sequencefile{\textquotedbl}}}
+
+{\ttfamily\color{black}
+\ \ [dir num-fields source]}
+
+{\ttfamily\color{black}
+\ \ \textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}\textcolor[rgb]{0.49803922,0.0,0.49803922}{let}
+[outargs
+\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}vars/gen-nullable-vars
+num-fields\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{)}]}
+
+{\ttfamily\color{black}
+\ \ \ \ \textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}{\textless}-
+outargs}
+
+{\ttfamily\color{black}
+\ \ \ \ \ \ \ \ \textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}source
+?line\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{)}}
+
+{\ttfamily\color{black}
+\ \ \ \ \ \ \ \ \textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}line-not-empty
+?line\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{)}}
+
+{\ttfamily\color{black}
+\ \ \ \ \ \ \ \ \textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}parse-line
+num-fields ?line
+\textcolor[rgb]{0.0,0.54509807,0.54509807}{:{\textgreater}{\textgreater}}
+outargs\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{)}}
+
+{\ttfamily\color{black}
+\ \ \ \ \ \ \ \ \textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}\textcolor[rgb]{0.0,0.54509807,0.54509807}{:distinct}
+false\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{))))}}
+\end{small}
+
+\framebreak
+
+\begin{small}
+{\ttfamily\color{black}
+\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}\textcolor[rgb]{0.49803922,0.0,0.49803922}{defn}
+\textcolor{blue}{textline-parsed}}
+
+{\ttfamily\color{black}
+\ \ \textcolor[rgb]{0.54509807,0.13333334,0.32156864}{{\textquotedbl}parse
+the input source as an HDFS TextLine (file). \ opts are for hfs-seqfile
+/ hfs-tap{\textquotedbl}}}
+
+{\ttfamily\color{black}
+\ \ [dir num-fields \& opts]}
+
+{\ttfamily\color{black}
+\ \ \textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}\textcolor[rgb]{0.49803922,0.0,0.49803922}{let}
+[source
+\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}\textcolor[rgb]{0.28235295,0.23921569,0.54509807}{apply}
+hfs-textline dir
+opts\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{)}]}
+
+{\ttfamily\color{black}
+\ \ \ \ \textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}in-tap-parsed
+dir num-fields
+source\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{)))}}
+
+\end{small}
+
+\bigskip
+
+\begin{small}
+{\ttfamily\color{black}
+\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}\textcolor[rgb]{0.49803922,0.0,0.49803922}{defn}
+\textcolor{blue}{parse-int}}
+
+{\ttfamily\color{black}
+\ \ [s]}
+
+{\ttfamily\color{black}
+\ \ \textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}\textcolor[rgb]{0.28235295,0.23921569,0.54509807}{Integer/parseInt}
+s\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{))}}
+\end{small}
+
+\bigskip
+
+\begin{small}
+{\ttfamily\color{black}
+\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}\textcolor[rgb]{0.49803922,0.0,0.49803922}{defn}
+\textcolor{blue}{parse-line}}
+
+{\ttfamily\color{black}
+\ \ [num-fields line]}
+
+{\ttfamily\color{black}
+\ \ \textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}\textcolor[rgb]{0.28235295,0.23921569,0.54509807}{take}
+num-fields
+\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}string/split line
+\#\textcolor[rgb]{0.54509807,0.13333334,0.32156864}{{\textquotedbl}{\textbackslash}t{\textquotedbl}}\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{)))}}
+
+
+\bigskip
+
+{\ttfamily\color{black}
+\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}\textcolor[rgb]{0.49803922,0.0,0.49803922}{defn}
+\textcolor{blue}{line-not-empty}}
+
+{\ttfamily\color{black}
+\ \ [line]}
+
+{\ttfamily\color{black}
+\ \ \textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}\textcolor[rgb]{0.28235295,0.23921569,0.54509807}{boolean}
+\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}\textcolor[rgb]{0.28235295,0.23921569,0.54509807}{seq}
+\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}\textcolor[rgb]{0.28235295,0.23921569,0.54509807}{.trim}
+line\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{))))}}
+\end{small}
+\end{frame}
+
+
+\begin{frame}{Custom aggregator - compute quartile boundaries}
+\begin{small}
+{\ttfamily\color{black}
+\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}\textcolor[rgb]{0.49803922,0.0,0.49803922}{defbufferop}
+\textcolor{blue}{quartile-bounds}}
+
+{\ttfamily\color{black}
+\ \ [tuples]}
+
+{\ttfamily\color{black}
+\ \ [\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}incanter.stats/quantile
+\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}\textcolor[rgb]{0.28235295,0.23921569,0.54509807}{map}
+first
+tuples\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{))}]\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{)}}
+\end{small}
+\end{frame}
+
+\begin{frame}{Query 2 - Add quartile number}
+\begin{small}
+
+{\ttfamily\color{black}
+\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}\textcolor[rgb]{0.49803922,0.0,0.49803922}{defn}
+\textcolor{blue}{query2}}
+
+{\ttfamily\color{black}
+\ \ [source ctr-quartiles]}
+
+{\ttfamily\color{black}
+\ \ \textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}\textcolor[rgb]{0.49803922,0.0,0.49803922}{let}
+[hclks
+\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}happy-clickers
+source\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{)}}
+
+{\ttfamily\color{black}
+\ \ \ \ \ \ \ \ hclk-qnums
+\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}{\textless}- [?uid
+?ctr ?qnum] \textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}hclks
+?uid ?ctr\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{)}}
+
+{\ttfamily\color{black}
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}ctr-quartiles
+?min ?b12 ?b23 ?b34
+?max\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{)}}
+
+{\ttfamily\color{black}
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}cast-dbls
+?min ?b12 ?b23 ?b34 ?max
+\textcolor[rgb]{0.0,0.54509807,0.54509807}{:{\textgreater}} ?min-dbl
+?b12-dbl ?b23-dbl ?b34-dbl
+?max-dbl\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{)}}
+
+{\ttfamily\color{black}
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}qnum-casc-fn
+?min-dbl ?b12-dbl ?b23-dbl ?b34-dbl ?max-dbl ?ctr
+\textcolor[rgb]{0.0,0.54509807,0.54509807}{:{\textgreater}}
+?qnum\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{)}}
+
+{\ttfamily\color{black}
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor[rgb]{0.69803923,0.13333334,0.13333334}{;;
+  need to specify to}}
+
+{\ttfamily\color{black}
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor[rgb]{0.69803923,0.13333334,0.13333334}{;;
+Cascalog that this is a cross-join}}
+
+{\ttfamily\color{black}
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}cross-join\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{))}]}
+
+{\ttfamily\color{black}
+\ \ \ \ hclk-qnums\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{))}}
+
+\end{small}
+\end{frame}
+
+
+
+\begin{frame}[allowframebreaks]{Other quartile fns and queries}
+\begin{small}
+
+{\ttfamily\color{black}
+\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}\textcolor[rgb]{0.49803922,0.0,0.49803922}{defn}
+\textcolor{blue}{quantile-num}}
+
+{\ttfamily\color{black}
+\ \ \textcolor[rgb]{0.54509807,0.13333334,0.32156864}{{\textquotedbl}find
+the quantile number (1-indexed) of data point x given a vector of
+quantile info as given by incanter{\textquotesingle}s quantile fn
+(first and last are min-val and max-val of dataset){\textquotedbl}}}
+
+{\ttfamily\color{black}
+\ \ [quantiles x]}
+
+{\ttfamily\color{black}
+\ \ \textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}\textcolor[rgb]{0.49803922,0.0,0.49803922}{let}
+[quant-ranges
+\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}\textcolor[rgb]{0.28235295,0.23921569,0.54509807}{partition}
+2 1 quantiles\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{)}]}
+
+{\ttfamily\color{black}
+\ \ \ \ \textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}\textcolor[rgb]{0.28235295,0.23921569,0.54509807}{inc}}
+
+{\ttfamily\color{black}
+\ \ \ \ \ \textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}\textcolor[rgb]{0.28235295,0.23921569,0.54509807}{first}
+\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}keep-indexed
+\#\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}\textcolor[rgb]{0.49803922,0.0,0.49803922}{if}
+\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}\textcolor[rgb]{0.28235295,0.23921569,0.54509807}{{\textless}=}
+\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}\textcolor[rgb]{0.28235295,0.23921569,0.54509807}{first}
+\%2\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{)} x
+\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}\textcolor[rgb]{0.28235295,0.23921569,0.54509807}{second}
+\%2\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{))}
+\%1\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{)}
+quant-ranges\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{)))))}}
+
+
+\framebreak
+
+
+{\ttfamily\color{black}
+\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}\textcolor[rgb]{0.49803922,0.0,0.49803922}{defn}
+\textcolor{blue}{cast-dbls}}
+
+{\ttfamily\color{black}
+\ \ [\& nums]}
+
+{\ttfamily\color{black}
+\ \ \textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}\textcolor[rgb]{0.28235295,0.23921569,0.54509807}{map}
+\#\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}\textcolor[rgb]{0.28235295,0.23921569,0.54509807}{Double/parseDouble}
+\%\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{)}
+nums\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{))}}
+
+\bigskip
+
+{\ttfamily\color{black}
+\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}\textcolor[rgb]{0.49803922,0.0,0.49803922}{defn}
+\textcolor{blue}{qnum-casc-fn}}
+
+{\ttfamily\color{black}
+\ \ \textcolor[rgb]{0.54509807,0.13333334,0.32156864}{{\textquotedbl}create
+a wrapper fn for quantile-num that works with Cascalog, that is,
+doesn{\textquotesingle}t take any collections as args{\textquotedbl}}}
+
+{\ttfamily\color{black}
+\ \ [min b12 b23 b34 max n]}
+
+{\ttfamily\color{black}
+\ \ \textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}quantile-num
+[min b12 b23 b34 max]
+n\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{))}}
+\end{small}
+\end{frame}
+
+
+\begin{frame}{Run queries}
+\begin{small}
+
+{\ttfamily\color{black}
+\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}\textcolor[rgb]{0.49803922,0.0,0.49803922}{defn}
+\textcolor{blue}{run}}
+
+{\ttfamily\color{black}
+\ \ \textcolor[rgb]{0.54509807,0.13333334,0.32156864}{{\textquotedbl}read
+in std in and return output{\textquotedbl}}}
+
+{\ttfamily\color{black}
+\ \ []}
+
+{\ttfamily\color{black}
+\ \ \textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}\textcolor[rgb]{0.49803922,0.0,0.49803922}{let} 
+[dir
+\textcolor[rgb]{0.54509807,0.13333334,0.32156864}{{\textquotedbl}hdfs://<hdfs\_namenode>/data/dir/path/{\textquotedbl}}\textcolor[rgb]{0.69803923,0.13333334,0.13333334}{}}
+
+{\ttfamily\color{black}
+\ \ \ \ \ \ \ \ intermediate
+\textcolor[rgb]{0.54509807,0.13333334,0.32156864}{{\textquotedbl}hdfs://<hdfs\_namenode>/intermediate/dir/path/{\textquotedbl}}}
+
+{\ttfamily\color{black}
+\ \ \ \ \ \ \ \ output
+\textcolor[rgb]{0.54509807,0.13333334,0.32156864}{{\textquotedbl}hdfs://<hdfs\_namenode>/output/dir/path/{\textquotedbl}}}
+
+{\ttfamily\color{black}
+\ \ \ \ \ \ \ \ source
+\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}seqfile-parsed dir
+12 \textcolor[rgb]{0.0,0.54509807,0.54509807}{:source-pattern}
+\textcolor[rgb]{0.54509807,0.13333334,0.32156864}{{\textquotedbl}ds=201306\{21,22,23,24,25,26,27\}{\textquotedbl}}\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{)}}
+
+
+\bigskip
+
+{\ttfamily\color{black}
+\ \ \ \ \ \ \ \ sink
+\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}hfs-textline
+output\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{)}]}
+
+
+{\ttfamily\color{black}
+\ \ \ \ \textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}?-
+\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}hfs-textline
+intermediate\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{)}
+\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}query1
+source\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{))}}
+
+{\ttfamily\color{black}
+\ \ \ \ \textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}with-job-conf
+\{\textcolor[rgb]{0.69803923,0.13333334,0.13333334}{}}
+
+{\ttfamily\color{black}
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor[rgb]{0.54509807,0.13333334,0.32156864}{{\textquotedbl}io.compression.codecs{\textquotedbl}}
+\textcolor[rgb]{0.54509807,0.13333334,0.32156864}{{\textquotedbl}org.apache.hadoop.io.compress.GzipCodec,org.apache.hadoop.io.compress.DefaultCodec,com.hadoop.compression.lzo.LzopCodec{\textquotedbl}}\}}
+
+{\ttfamily\color{black}
+\ \ \ \ \ \ \textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}?- sink
+\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}query2 source
+\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{(}textline-parsed
+intermediate
+5\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{))))))}}
+\end{small}
+\end{frame}
+
+\begin{frame}{Improving this Cascalog example}
+  \begin{itemize}
+  \item Parsing a tab-separated (TSV) file is already supported by
+    Cascalog fns (use those instead)
+  \item Instead of writing and reading the ``intermediate'' values to
+    disk using 2 disjoint queries, it might be more efficient to pull into memory as Clojure
+    data structures using \texttt{??-} or \texttt{??<-}
+  \item There probably is a way to generalize the quartile code for
+    any quantiles of size n (ex: ``deciles'' when n=10)
+  \item The first two points above will further decrease code size
+  \end{itemize}
+\end{frame}
 
 \end{document}
