@@ -69,7 +69,7 @@
     \item Need standard (Sun/Oracle) Java 1.6+ - \url{http://www.oracle.com/technetwork/java/javase/downloads/index.html}
     \item Clojure JAR downloads - \url{http://clojure.org/downloads}
     \item Can run the REPL (``interpreter'') with\\
-\texttt{java -cp clojure-1.5.1.jar clojure.main}
+\texttt{java -cp clojure-1.6.0.jar clojure.main}
     \end{itemize}
   \item Try Clojure - online vanilla REPL - \url{http://tryclj.com/}
     \framebreak
@@ -97,7 +97,7 @@
       \item Editing code structure as natural as editing code
       \end{itemize}
     \item Integrated REPL, lightweight editor, etc.
-    \item Get Emacs 24b or later, and install \texttt{emacs-starter-kit}
+    \item Get Emacs 24 or later, and install \texttt{emacs-starter-kit}
     \end{itemize}
   \item Eclipse + Counterclockwise
     \begin{itemize}
@@ -853,6 +853,9 @@ res11: Int = 5}
   \item Dynamic typing (like Perl, Ruby, Scala; unlike Java)
     \begin{itemize}
       \item Type checking happens at run-time, not compile-time
+        \begin{itemize}
+          \item Optional typing might provide type annotation checking
+        \end{itemize}
       \item Trust in programmer's ability to write good code
       \item Benefit is expressive power (ex: macros)
       \item Incremental development via REPL $\Rightarrow$ less unexpected
@@ -1759,7 +1762,7 @@ v5 == v4(1)}
   \item Immutable values can be safely used in sets and in map keys
     \begin{itemize}
     \item Whereas Java allows mutable objects in sets or map keys (unadvisable)
-    \item Python disallows mutable objectslists in sets or map keys
+    \item Python disallows mutable objects (ex: lists) in sets or map keys
     \end{itemize}
   \item In general, Clojure uniquely teases out
     \begin{itemize}
@@ -1807,7 +1810,7 @@ v5 == v4(1)}
     operate on one data structure than 10 functions on 10 data
     structures.''\\
     \hline
-    design patterns & no & ?? & equivalent outcomes done in other
+    design patterns & no & some & equivalent outcomes done in other
     ways\\
     \hline
     FP & yes & sort of & fns compose and can be used as arguments to
@@ -1819,7 +1822,7 @@ v5 == v4(1)}
     aspect & Clojure & Scala & why? (Clojure)\\
     \hline
     \hline
-    concurrency & yes & yes* (?) & Clojure designed for this from the
+    concurrency & yes & yes & Clojure designed for this from the
     beginning\\
     \hline
     persistent data structures & yes & yes & only reasonable way to
@@ -2585,7 +2588,7 @@ xml]\textcolor[rgb]{0.54901963,0.54901963,0.54901963}{)}}
     \end{itemize}
 
     \framebreak
-  \item Basic hreading macros (\texttt{->} and \texttt{->>})
+  \item Basic threading macros (\texttt{->} and \texttt{->>})
     \begin{itemize}
     \item Write nested forms ``inside out'' (more readable)
     \item \texttt{->} puts result of previous form in 2nd position
@@ -3520,6 +3523,8 @@ intermediate
 
 \begin{frame}{Improving this Cascalog example}
   \begin{itemize}
+  \item Update versions (currently: Cascalog 2.1.1, etc.)
+  \item Show testing situation -- pretty simple
   \item Parsing a tab-separated (TSV) file is already supported by
     Cascalog fns (use those instead)
   \item Instead of writing and reading the ``intermediate'' values to
